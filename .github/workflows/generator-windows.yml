@@ -447,7 +447,24 @@ jobs:
           fi
           head -n 100 "${VCPKG_ROOT}/buildtrees/ffmpeg/build-${{ matrix.job.vcpkg-triplet }}-rel-out.log" || true
         shell: bash
+        
+      - name: Show AOM configure error
+        if: failure()
+        shell: pwsh
+        run: |
+          $files = @(
+            "C:\vcpkg\buildtrees\aom\config-x64-windows-static-out.log",
+            "C:\vcpkg\buildtrees\aom\config-x64-windows-static-dbg-CMakeConfigureLog.yaml.log",
+            "C:\vcpkg\buildtrees\aom\config-x64-windows-static-rel-CMakeConfigureLog.yaml.log"
+          )
 
+          foreach ($file in $files) {
+            if (Test-Path $file) {
+              Write-Host "`n========== $file =========="
+              Get-Content $file -Tail 100
+            }
+          }
+          
       - name: Save vcpkg installed cache
         uses: actions/cache/save@v4
         continue-on-error: true
